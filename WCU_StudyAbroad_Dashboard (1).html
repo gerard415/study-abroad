@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WCU Global Engagement — Study Abroad Analytics</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --navy: #0A1628;
+    --navy-mid: #122040;
+    --navy-light: #1E3560;
+    --cream: #F7F2E8;
+    --cream-dark: #EDE5D4;
+    --text: #1A1A2E;
+    --text-muted: #6B7280;
+    --white: #FFFFFF;
+    --accent-teal: #2E8B8B;
+    --accent-rose: #C4614A;
+    --accent-sage: #5A7A5A;
+    --accent-lilac: #7B6FA0;
+    --shadow: 0 4px 24px rgba(10,22,40,0.12);
+    --shadow-lg: 0 12px 48px rgba(10,22,40,0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .site-header {
+    background: var(--navy);
+    color: var(--white);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .header-inner {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 52px 48px 44px;
+    position: relative;
+    z-index: 2;
+  }
+  .header-tag {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 2px;
+    margin-bottom: 18px;
+  }
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+  }
+  .header-title span { color: var(--gold); }
+  .header-sub {
+    font-size: 15px;
+    color: rgba(255,255,255,0.65);
+    font-weight: 300;
+    letter-spacing: 0.3px;
+  }
+  .header-bg-pattern {
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 45%;
+    background: linear-gradient(135deg, transparent 0%, rgba(201,168,76,0.06) 100%);
+    pointer-events: none;
+  }
+  .header-bg-lines {
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    height: 40px;
+    background: var(--cream);
+    clip-path: ellipse(55% 100% at 50% 100%);
+  }
+
+  /* STATS ROW */
+  .stats-row {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 36px 48px 8px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .stat-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 28px 24px;
+    box-shadow: var(--shadow);
+    border-top: 3px solid var(--gold);
+    transition: transform 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-3px); }
+  .stat-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    font-weight: 900;
+    color: var(--navy);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-weight: 500;
+  }
+  .stat-change {
+    font-size: 12px;
+    color: var(--accent-sage);
+    margin-top: 6px;
+    font-weight: 600;
+  }
+
+  /* COVID BANNER */
+  .covid-banner {
+    max-width: 1300px;
+    margin: 20px auto 0;
+    padding: 0 48px;
+  }
+  .covid-inner {
+    background: linear-gradient(135deg, #FFF8E7, #FFEFC0);
+    border: 1px solid var(--gold-light);
+    border-left: 4px solid var(--gold);
+    border-radius: 8px;
+    padding: 14px 20px;
+    font-size: 13.5px;
+    color: #5C4700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .covid-icon { font-size: 18px; flex-shrink: 0; }
+
+  /* NAV TABS */
+  .nav-section {
+    max-width: 1300px;
+    margin: 32px auto 0;
+    padding: 0 48px;
+  }
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--white);
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    flex: 1;
+    min-width: 120px;
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    text-align: center;
+  }
+  .nav-tab:hover { background: var(--cream); color: var(--navy); }
+  .nav-tab.active {
+    background: var(--navy);
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  /* CONTENT PANELS */
+  .panels-wrapper {
+    max-width: 1300px;
+    margin: 24px auto 48px;
+    padding: 0 48px;
+  }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* SECTION HEADING */
+  .section-heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .section-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 64px;
+    font-weight: 900;
+    color: var(--cream-dark);
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: -8px;
+  }
+  .section-text {}
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .section-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    max-width: 640px;
+    line-height: 1.6;
+  }
+
+  /* CHART GRID */
+  .chart-grid { display: grid; gap: 24px; }
+  .chart-grid-2 { grid-template-columns: 1fr 1fr; }
+  .chart-grid-3 { grid-template-columns: 2fr 1fr; }
+
+  .chart-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+  .chart-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .chart-card-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    letter-spacing: 0.3px;
+  }
+  .chart-container { position: relative; }
+  .chart-container canvas { max-width: 100%; }
+
+  /* INSIGHT CARDS */
+  .insight-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .insight-card {
+    background: var(--navy);
+    color: var(--white);
+    border-radius: 12px;
+    padding: 20px 22px;
+  }
+  .insight-icon { font-size: 24px; margin-bottom: 8px; }
+  .insight-text {
+    font-size: 13px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.82);
+  }
+  .insight-text strong { color: var(--gold-light); }
+
+  /* LOCATION TABLE */
+  .loc-table-wrap { overflow-x: auto; margin-top: 16px; }
+  table.loc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  .loc-table th {
+    background: var(--navy);
+    color: var(--white);
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .loc-table th:first-child { border-radius: 8px 0 0 0; }
+  .loc-table th:last-child { border-radius: 0 8px 0 0; }
+  .loc-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--cream-dark);
+    color: var(--text);
+  }
+  .loc-table tr:last-child td { border-bottom: none; }
+  .loc-table tr:hover td { background: var(--cream); }
+  .bar-cell { position: relative; }
+  .bar-fill {
+    display: inline-block;
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    vertical-align: middle;
+    margin-right: 8px;
+    min-width: 4px;
+  }
+  .rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .rank-1 { background: #FFD700; color: #5C4700; }
+  .rank-2 { background: #C0C0C0; color: #333; }
+  .rank-3 { background: #CD7F32; color: #fff; }
+  .rank-other { background: var(--cream-dark); color: var(--text-muted); }
+
+  /* NOTE BOX */
+  .note-box {
+    background: var(--cream);
+    border: 1px solid var(--cream-dark);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+  .note-box strong { color: var(--text); }
+
+  /* FOOTER */
+  footer {
+    background: var(--navy);
+    color: rgba(255,255,255,0.4);
+    text-align: center;
+    padding: 28px 48px;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+  }
+
+  @media (max-width: 900px) {
+    .stats-row { grid-template-columns: 1fr 1fr; padding: 24px 20px 8px; }
+    .nav-section, .panels-wrapper, .covid-banner { padding: 0 20px; }
+    .chart-grid-2, .chart-grid-3 { grid-template-columns: 1fr; }
+    .insight-row { grid-template-columns: 1fr; }
+    .header-inner { padding: 36px 20px 32px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-bg-pattern"></div>
+  <div class="header-inner">
+    <div class="header-tag">Global Engagement Office · WCU</div>
+    <h1 class="header-title">Study Abroad<br><span>Program Analytics</span></h1>
+    <p class="header-sub">Academic Years 2014–2015 through 2024–2025 &nbsp;·&nbsp; 8-Year Longitudinal Analysis</p>
+  </div>
+  <div class="header-bg-lines"></div>
+</header>
+
+<!-- STATS ROW -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-number">3,643</div>
+    <div class="stat-label">Total Participants</div>
+    <div class="stat-change">↑ Recovery underway post-COVID</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">64</div>
+    <div class="stat-label">Countries Visited</div>
+    <div class="stat-change">Across all program years</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">74%</div>
+    <div class="stat-label">Avg. Female Participation</div>
+    <div class="stat-change">Consistent across all years</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">79%</div>
+    <div class="stat-label">Avg. WCU-Arranged Programs</div>
+    <div class="stat-change">vs. 21% Affiliate/Non-Affiliate</div>
+  </div>
+</div>
+
+<!-- COVID BANNER -->
+<div class="covid-banner">
+  <div class="covid-inner">
+    <span class="covid-icon">⚠️</span>
+    <span><strong>Note on data gap:</strong> Academic years 2019–2020 and 2020–2021 are absent from this dataset due to COVID-19 program suspensions. Enrollment dropped sharply from 482 students (2018–19) to 200 students (2021–22) upon resumption. Data discrepancies between sheets reflect year-to-year compilation differences and are noted where relevant.</span>
+  </div>
+</div>
+
+<!-- NAV TABS -->
+<div class="nav-section">
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPanel(0)">📈 Enrollment</button>
+    <button class="nav-tab" onclick="showPanel(1)">🏛️ Program Type</button>
+    <button class="nav-tab" onclick="showPanel(2)">⚥ Gender</button>
+    <button class="nav-tab" onclick="showPanel(3)">🌍 Ethnic Identity</button>
+    <button class="nav-tab" onclick="showPanel(4)">📍 Locations</button>
+    <button class="nav-tab" onclick="showPanel(5)">📅 Terms</button>
+    <button class="nav-tab" onclick="showPanel(6)">🎓 Majors</button>
+  </div>
+</div>
+
+<!-- PANELS -->
+<div class="panels-wrapper">
+
+  <!-- PANEL 0: ENROLLMENT OVERVIEW -->
+  <div class="panel active" id="panel-0">
+    <div class="section-heading">
+      <div class="section-num">01</div>
+      <div class="section-text">
+        <div class="section-title">Enrollment Over Time</div>
+        <div class="section-desc">Total student participation by academic year, split between undergraduate and graduate students. The COVID-19 gap is clearly marked. Numbers reflect a recovery trajectory from 2021 onward.</div>
+      </div>
+    </div>
+    <div class="chart-grid chart-grid-3">
+      <div class="chart-card">
+        <div class="chart-card-title">Total Enrollment by Year</div>
+        <div class="chart-card-sub">Undergrad vs. Graduate breakdown · COVID gap 2019–2021</div>
+        <div class="chart-container" style="height:320px">
+          <canvas id="enrollChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Academic Level Split</div>
+        <div class="chart-card-sub">Average over all 9 years</div>
+        <div class="chart-container" style="height:320px">
+          <canvas id="levelDonut"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="insight-row">
+      <div class="insight-card">
+        <div class="insight-icon">📈</div>
+        <div class="insight-text">Enrollment peaked at <strong>536 students in 2017–18</strong>, the program's highest recorded year before the pandemic.</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">📈</div>
+        <div class="insight-text">2024–25 saw <strong>388 students</strong> — the highest post-COVID total yet, continuing a steady recovery now in its fourth year.</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">🎓</div>
+        <div class="insight-text">Graduate participation rebounded strongly to <strong>38 students in 2024–25</strong>, the highest post-COVID figure and the best performance since 2018–19.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL 1: PROGRAM TYPE -->
+  <div class="panel" id="panel-1">
+    <div class="section-heading">
+      <div class="section-num">02</div>
+      <div class="section-text">
+        <div class="section-title">Program Type</div>
+        <div class="section-desc">Comparison of WCU-Arranged programs versus Affiliate & Non-Affiliate programs across all years. WCU-Arranged programs dominate consistently, but Affiliate usage spiked in 2018–19.</div>
+      </div>
+    </div>
+    <div class="chart-grid chart-grid-2">
+      <div class="chart-card">
+        <div class="chart-card-title">WCU-Arranged vs. Affiliate/Non-Affiliate</div>
+        <div class="chart-card-sub">Raw counts per academic year</div>
+        <div class="chart-container" style="height:320px">
+          <canvas id="progTypeBar"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Program Share (%) by Year</div>
+        <div class="chart-card-sub">Proportion of each program type</div>
+        <div class="chart-container" style="height:320px">
+          <canvas id="progTypeArea"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="insight-row">
+      <div class="insight-card">
+        <div class="insight-icon">🏫</div>
+        <div class="insight-text">WCU-Arranged programs account for an average of <strong>79% of all participants</strong> across every recorded year.</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">📊</div>
+        <div class="insight-text">Affiliate/Non-Affiliate usage peaked at <strong>31% in 2018–19</strong>. In 2024–25, WCU-Arranged dominated even more strongly at 86%, the highest share since 2021–22.</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">🔄</div>
+        <div class="insight-text">WCU-Arranged programs drove most of the 2024–25 recovery — <strong>334 students</strong>, nearly matching the 2018–19 pre-COVID total of 334.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL 2: GENDER -->
+  <div class="panel" id="panel-2">
+    <div class="section-heading">
+      <div class="section-num">03</div>
+      <div class="section-text">
+        <div class="section-title">Gender Distribution</div>
+        <div class="section-desc">Male vs. female vs. other participation across all years. Study abroad programs nationally skew female; WCU's data reflects this pattern strongly.</div>
+      </div>
+    </div>
+    <div class="chart-grid chart-grid-2">
+      <div class="chart-card">
+        <div class="chart-card-title">Male vs. Female Participants by Year</div>
+        <div class="chart-card-sub">Absolute counts — the gender gap is consistent</div>
+        <div class="chart-container" style="height:320px">
+          <canvas id="genderLine"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Average Gender Split</div>
+        <div class="chart-card-sub">Proportion across all 9 years combined</div>
+        <div class="chart-container" style="height:320px">
+          <canvas id="genderDonut"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="insight-row">
+      <div class="insight-card">
+        <div class="insight-icon">♀</div>
+        <div class="insight-text">Female students make up approximately <strong>74% of all participants</strong> across every year — a ratio consistent with national study abroad trends.</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">♂</div>
+        <div class="insight-text">Male participation peaked at <strong>158 students in 2017–18</strong> (30% of that year's total) — the closest to gender parity in the dataset.</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">🌈</div>
+        <div class="insight-text">"Other" gender category first appeared in <strong>2017–18 with 2 students</strong> and was recorded in three subsequent years, reflecting evolving data collection practices.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL 3: ETHNICITY -->
+  <div class="panel" id="panel-3">
+    <div class="section-heading">
+      <div class="section-num">04</div>
+      <div class="section-text">
+        <div class="section-title">Ethnic Identity</div>
+        <div class="section-desc">Racial and ethnic composition of study abroad participants over time. Understanding diversity in participation is key for equity-focused program development.</div>
+      </div>
+    </div>
+    <div class="chart-grid chart-grid-3">
+      <div class="chart-card">
+        <div class="chart-card-title">Ethnic Identity by Year</div>
+        <div class="chart-card-sub">Stacked area — all recorded categories</div>
+        <div class="chart-container" style="height:340px">
+          <canvas id="ethnicStack"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Overall Composition</div>
+        <div class="chart-card-sub">Total across all 9 years</div>
+        <div class="chart-container" style="height:340px">
+          <canvas id="ethnicDonut"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="insight-row">
+      <div class="insight-card">
+        <div class="insight-icon">🌍</div>
+        <div class="insight-text">White students represent an average of <strong>~78% of participants</strong> — a significant over-representation relative to most campus demographics.</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">📈</div>
+        <div class="insight-text">Black student participation reached <strong>51 students in 2024–25</strong> — the highest post-COVID figure, driven in large part by the Ghana Winter program which drew 14 Black women in a single cohort.</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">🌍</div>
+        <div class="insight-text">The <strong>Ghana Winter Experiential Learning program</strong> is the single most significant equity development in the dataset — nearly all participants were Black women, demonstrating what targeted programming can achieve.</div>
+      </div>
+    </div>
+    <div class="note-box">
+      <strong>Data Note:</strong> "Unknown" category appears in some years (up to 34 students in 2014–15) and was absent in others, suggesting inconsistent collection methods across years. Multi-Racial data was not recorded in some post-COVID years.
+    </div>
+  </div>
+
+  <!-- PANEL 4: LOCATIONS -->
+  <div class="panel" id="panel-4">
+    <div class="section-heading">
+      <div class="section-num">05</div>
+      <div class="section-text">
+        <div class="section-title">Popular Destinations</div>
+        <div class="section-desc">Countries and regions where WCU students studied abroad. The data covers destinations across all program years. In 2024–25, United Kingdom (52) and Japan (48) surpassed Italy as the top destinations for the first time.</div>
+      </div>
+    </div>
+    <div class="chart-grid chart-grid-2">
+      <div class="chart-card">
+        <div class="chart-card-title">Top 15 Destinations (All Years)</div>
+        <div class="chart-card-sub">Combined total across 2014–2024</div>
+        <div class="loc-table-wrap">
+          <table class="loc-table" id="locTable"></table>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Top 10 Destinations by Year</div>
+        <div class="chart-card-sub">Horizontal bar — trend shifts visible</div>
+        <div class="chart-container" style="height:380px">
+          <canvas id="locBar"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="note-box">
+      <strong>Data Note:</strong> "London" appears as a separate entry from "United Kingdom" in the raw data — these were kept separate as recorded. A large "Unknown" category (54 students in 2014–15) and "MultiCountry" entries are included in totals but excluded from the destination ranking.
+    </div>
+  </div>
+
+  <!-- PANEL 5: TERMS -->
+  <div class="panel" id="panel-5">
+    <div class="section-heading">
+      <div class="section-num">06</div>
+      <div class="section-text">
+        <div class="section-title">Terms of Study</div>
+        <div class="section-desc">When are students choosing to go? This panel breaks down participation by academic term — revealing a strong preference for Summer and Spring Break programs over full-semester commitments.</div>
+      </div>
+    </div>
+    <div class="chart-grid chart-grid-2">
+      <div class="chart-card">
+        <div class="chart-card-title">Term Participation by Year</div>
+        <div class="chart-card-sub">Grouped bar chart — all 9 term types</div>
+        <div class="chart-container" style="height:340px">
+          <canvas id="termBar"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Overall Term Preference</div>
+        <div class="chart-card-sub">Total across all recorded years</div>
+        <div class="chart-container" style="height:340px">
+          <canvas id="termDonut"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="insight-row">
+      <div class="insight-card">
+        <div class="insight-icon">☀️</div>
+        <div class="insight-text"><strong>Summer Semester remains the most popular term</strong>, consistently accounting for 40–52% of all participation. Students prefer shorter, lower-commitment options.</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">🌸</div>
+        <div class="insight-text">Spring Break surged to <strong>116 students in 2024–25</strong> — the highest since 2016–17 and a dramatic reversal of its post-COVID decline. This is the year's most notable term trend.</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">❄️</div>
+        <div class="insight-text">Winter term rebounded to <strong>29 students in 2024–25</strong> from just 6 in 2023–24, largely driven by the Ghana Winter program. Spring Semester also held strong at 62 students.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL 6: MAJORS -->
+  <div class="panel" id="panel-6">
+    <div class="section-heading">
+      <div class="section-num">07</div>
+      <div class="section-text">
+        <div class="section-title">Student Majors</div>
+        <div class="section-desc">Which academic disciplines are study abroad students coming from? This panel breaks participation down by major and by broad academic category, revealing which fields engage most with global education opportunities.</div>
+      </div>
+    </div>
+    <div class="chart-grid chart-grid-2">
+      <div class="chart-card">
+        <div class="chart-card-title">Participation by Academic Category</div>
+        <div class="chart-card-sub">Stacked bar — broad discipline groupings by year</div>
+        <div class="chart-container" style="height:340px">
+          <canvas id="majorCatBar"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Overall Discipline Breakdown</div>
+        <div class="chart-card-sub">All years combined — share by category</div>
+        <div class="chart-container" style="height:340px">
+          <canvas id="majorDonut"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="chart-grid" style="margin-top:24px;">
+      <div class="chart-card">
+        <div class="chart-card-title">Top 15 Individual Majors — All Years Combined</div>
+        <div class="chart-card-sub">Ranked by total participation across all 9 recorded years</div>
+        <div class="loc-table-wrap">
+          <table class="loc-table" id="majorTable"></table>
+        </div>
+      </div>
+    </div>
+    <div class="insight-row">
+      <div class="insight-card">
+        <div class="insight-icon">📚</div>
+        <div class="insight-text"><strong>Arts, Humanities & Social Sciences dominate</strong> — accounting for the largest share of participation in every year. Psychology, Political Science, Communications, and Criminal Justice are consistently among the top majors.</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">🏥</div>
+        <div class="insight-text">Health Sciences participation held strong in 2024–25 at 51 students, with Nutrition, Communicative Disorders, and Sports Medicine leading. <strong>Speech Language Pathology</strong> appeared prominently in graduate programs this year.</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">📐</div>
+        <div class="insight-text"><strong>Education majors surged to 49 students in 2024–25</strong> — matching 2018–19 pre-COVID levels — driven by the Sweden K-8 program and Costa Rica literacy programs. A clear sign of recovery in this discipline.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  West Chester University · Global Engagement Office · Study Abroad Program Data · AY 2014–15 through 2024–25 · Compiled for internal analysis
+</footer>
+
+<script>
+const YEARS = ['2014–15','2015–16','2016–17','2017–18','2018–19','2021–22','2022–23','2023–24','2024–25'];
+const NAVY = '#0A1628';
+const GOLD = '#C9A84C';
+const GOLD2 = '#E8C97A';
+const TEAL = '#2E8B8B';
+const ROSE = '#C4614A';
+const SAGE = '#5A7A5A';
+const LILAC = '#7B6FA0';
+const CREAM = '#F7F2E8';
+
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.color = '#6B7280';
+
+function showPanel(idx) {
+  document.querySelectorAll('.panel').forEach((p,i)=>{
+    p.classList.toggle('active', i===idx);
+  });
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>{
+    t.classList.toggle('active', i===idx);
+  });
+}
+
+// ---- PANEL 0: ENROLLMENT ----
+const enrollCtx = document.getElementById('enrollChart').getContext('2d');
+new Chart(enrollCtx, {
+  type: 'bar',
+  data: {
+    labels: YEARS,
+    datasets: [
+      {
+        label: 'Undergraduate',
+        data: [442,451,412,453,427,196,256,306,350],
+        backgroundColor: NAVY,
+        borderRadius: 4,
+        stack: 's'
+      },
+      {
+        label: 'Graduate',
+        data: [19,49,67,83,55,4,10,16,38],
+        backgroundColor: GOLD,
+        borderRadius: 4,
+        stack: 's'
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom' },
+      annotation: {}
+    },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, beginAtZero: true, grid: { color: '#F0EBE0' } }
+    }
+  }
+});
+// add COVID gap annotation manually via label
+enrollCtx.canvas.parentElement.insertAdjacentHTML('beforeend', `
+  <div style="position:absolute;top:0;right:8px;font-size:10px;color:#C9A84C;font-weight:600;letter-spacing:0.5px;">COVID GAP →</div>
+`);
+
+const levelCtx = document.getElementById('levelDonut').getContext('2d');
+new Chart(levelCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Undergraduate','Graduate'],
+    datasets: [{ data: [3347,296], backgroundColor: [NAVY, GOLD], borderWidth: 0, hoverOffset: 8 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '70%',
+    plugins: { legend: { position: 'bottom' } }
+  }
+});
+
+// ---- PANEL 1: PROGRAM TYPE ----
+const ptBarCtx = document.getElementById('progTypeBar').getContext('2d');
+new Chart(ptBarCtx, {
+  type: 'bar',
+  data: {
+    labels: YEARS,
+    datasets: [
+      { label: 'WCU-Arranged', data: [349,396,380,419,334,180,194,260,334], backgroundColor: NAVY, borderRadius: 4 },
+      { label: 'Affiliate/Non-Affiliate', data: [112,104,108,117,148,20,72,62,54], backgroundColor: GOLD, borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom' } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, grid: { color: '#F0EBE0' } }
+    }
+  }
+});
+
+const wcuArr = [349,396,380,419,334,180,194,260,334];
+const affArr = [112,104,108,117,148,20,72,62,54];
+const totals = wcuArr.map((v,i)=>v+affArr[i]);
+const ptAreaCtx = document.getElementById('progTypeArea').getContext('2d');
+new Chart(ptAreaCtx, {
+  type: 'bar',
+  data: {
+    labels: YEARS,
+    datasets: [
+      {
+        label: 'WCU-Arranged %',
+        data: wcuArr.map((v,i)=>+(v/totals[i]*100).toFixed(1)),
+        backgroundColor: NAVY, borderRadius: 4, stack: 's'
+      },
+      {
+        label: 'Affiliate/Non-Affiliate %',
+        data: affArr.map((v,i)=>+(v/totals[i]*100).toFixed(1)),
+        backgroundColor: GOLD, borderRadius: 4, stack: 's'
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom' } },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, min:0, max:100, ticks: { callback: v=>v+'%' }, grid: { color: '#F0EBE0' } }
+    }
+  }
+});
+
+// ---- PANEL 2: GENDER ----
+const gLineCtx = document.getElementById('genderLine').getContext('2d');
+new Chart(gLineCtx, {
+  type: 'line',
+  data: {
+    labels: YEARS,
+    datasets: [
+      {
+        label: 'Female',
+        data: [367,362,374,376,338,146,197,225,241],
+        borderColor: ROSE, backgroundColor: ROSE+'20',
+        tension: 0.4, fill: false, pointRadius: 5, pointHoverRadius: 7, borderWidth: 2.5
+      },
+      {
+        label: 'Male',
+        data: [94,138,114,158,142,52,64,97,101],
+        borderColor: TEAL, backgroundColor: TEAL+'20',
+        tension: 0.4, fill: false, pointRadius: 5, pointHoverRadius: 7, borderWidth: 2.5
+      },
+      {
+        label: 'Other',
+        data: [0,0,0,2,2,2,5,0,8],
+        borderColor: LILAC, backgroundColor: LILAC+'20',
+        tension: 0.4, fill: false, pointRadius: 4, borderWidth: 1.5, borderDash: [4,4]
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom' } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, grid: { color: '#F0EBE0' } }
+    }
+  }
+});
+
+const gDonutCtx = document.getElementById('genderDonut').getContext('2d');
+new Chart(gDonutCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Female','Male','Other'],
+    datasets: [{ data: [2630,960,19], backgroundColor: [ROSE, TEAL, LILAC], borderWidth: 0, hoverOffset: 8 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '68%',
+    plugins: { legend: { position: 'bottom' } }
+  }
+});
+
+// ---- PANEL 3: ETHNICITY ----
+const ethColors = [NAVY, GOLD, TEAL, ROSE, SAGE, LILAC, '#B8860B'];
+const ethCtx = document.getElementById('ethnicStack').getContext('2d');
+new Chart(ethCtx, {
+  type: 'bar',
+  data: {
+    labels: YEARS,
+    datasets: [
+      { label: 'White', data: [367,412,396,397,347,160,207,246,272], backgroundColor: NAVY, stack:'s', borderRadius:2 },
+      { label: 'Black', data: [14,28,32,60,56,17,35,47,51], backgroundColor: ROSE, stack:'s', borderRadius:2 },
+      { label: 'Hispanic', data: [30,25,32,33,32,16,2,18,15], backgroundColor: GOLD, stack:'s', borderRadius:2 },
+      { label: 'Asian/Pacific', data: [4,12,11,17,13,7,7,11,11], backgroundColor: TEAL, stack:'s', borderRadius:2 },
+      { label: 'Multi-Racial', data: [12,7,16,23,21,0,8,0,12], backgroundColor: SAGE, stack:'s', borderRadius:2 },
+      { label: 'Native American', data: [0,0,1,1,0,0,1,0,0], backgroundColor: '#8B4513', stack:'s', borderRadius:2 },
+      { label: 'Unknown', data: [34,16,0,5,13,0,6,0,42], backgroundColor: '#D3D3D3', stack:'s', borderRadius:2 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, grid: { color: '#F0EBE0' } }
+    }
+  }
+});
+
+const ethDonutCtx = document.getElementById('ethnicDonut').getContext('2d');
+new Chart(ethDonutCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['White','Black','Hispanic','Asian/Pacific','Multi-Racial','Native American','Unknown'],
+    datasets: [{
+      data: [2804,340,203,93,99,3,116],
+      backgroundColor: [NAVY, ROSE, GOLD, TEAL, SAGE, '#8B4513','#D3D3D3'],
+      borderWidth: 0, hoverOffset: 8
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '65%',
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
+  }
+});
+
+// ---- PANEL 4: LOCATIONS ----
+const rawLoc = {
+  'Italy': [17,51,66,46,50,33,51,39,40],
+  'Spain': [45,68,33,24,45,11,9,13,34],
+  'Germany': [1,2,22,33,21,63,7,20,21],
+  'Greece': [27,8,15,3,3,11,8,28,14],
+  'Costa Rica': [43,48,34,20,20,4,10,11,25],
+  'United Kingdom': [25,37,47,22,31,0,4,18,52],
+  'Austria': [13,12,11,10,14,14,12,13,7],
+  'South Africa': [14,30,31,28,51,0,22,0,0],
+  'Ireland': [14,32,8,17,17,23,16,38,37],
+  'Japan': [4,4,3,9,6,0,5,3,48],
+  'France': [13,12,2,10,8,15,19,4,27],
+  'Netherlands': [0,0,0,0,0,0,1,0,25],
+  'Ghana': [0,0,6,8,0,2,2,0,22],
+  'Argentina': [2,26,1,1,0,0,3,0,0],
+  'Honduras': [0,13,8,28,12,10,0,22,0],
+  'China': [11,13,15,46,29,0,0,0,0],
+  'Kenya': [9,5,0,0,0,8,13,16,7],
+  'Peru': [5,12,24,3,2,1,0,27,0],
+  'Mexico': [0,0,0,0,0,0,0,0,12],
+  'Rwanda': [0,0,0,0,5,0,9,0,8],
+};
+
+const locTotals = Object.entries(rawLoc).map(([name,vals])=>({name, total: vals.reduce((a,b)=>a+b,0)}));
+locTotals.sort((a,b)=>b.total-a.total);
+const top15 = locTotals.slice(0,15);
+const maxLoc = top15[0].total;
+
+const tbl = document.getElementById('locTable');
+tbl.innerHTML = `<thead><tr><th>#</th><th>Destination</th><th>Total Students</th><th style="width:180px">Visual</th></tr></thead>`;
+const tbody = document.createElement('tbody');
+top15.forEach((d,i)=>{
+  const rank = i<3 ? `rank-${i+1}` : 'rank-other';
+  const barW = Math.round(d.total/maxLoc*160);
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><span class="rank-badge ${rank}">${i+1}</span></td>
+    <td><strong>${d.name}</strong></td>
+    <td>${d.total}</td>
+    <td class="bar-cell"><span class="bar-fill" style="width:${barW}px"></span></td>
+  `;
+  tbody.appendChild(tr);
+});
+tbl.appendChild(tbody);
+
+const locBarCtx = document.getElementById('locBar').getContext('2d');
+const top10 = locTotals.slice(0,10).reverse();
+new Chart(locBarCtx, {
+  type: 'bar',
+  data: {
+    labels: top10.map(d=>d.name),
+    datasets: [{ data: top10.map(d=>d.total), backgroundColor: [
+      NAVY,GOLD,TEAL,ROSE,SAGE,LILAC,'#B8860B','#2E5B8B','#8B4513','#4A7A4A'
+    ].reverse(), borderRadius: 4 }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { beginAtZero: true, grid: { color: '#F0EBE0' } },
+      y: { grid: { display: false } }
+    }
+  }
+});
+
+// ---- PANEL 5: TERMS ----
+const termBarCtx = document.getElementById('termBar').getContext('2d');
+new Chart(termBarCtx, {
+  type: 'bar',
+  data: {
+    labels: YEARS,
+    datasets: [
+      { label: 'Summer Semester', data: [188,247,200,298,251,200,151,171,169], backgroundColor: GOLD, borderRadius: 3 },
+      { label: 'Spring Break', data: [143,138,137,110,108,0,52,26,116], backgroundColor: SAGE, borderRadius: 3 },
+      { label: 'Spring Semester', data: [45,35,40,36,36,0,33,104,62], backgroundColor: TEAL, borderRadius: 3 },
+      { label: 'Winter', data: [44,52,67,22,45,0,17,6,29], backgroundColor: LILAC, borderRadius: 3 },
+      { label: 'Fall Semester', data: [19,19,28,41,24,0,13,15,11], backgroundColor: ROSE, borderRadius: 3 },
+      { label: 'Fall Short Term', data: [16,1,0,9,10,0,0,0,0], backgroundColor: '#8B4513', borderRadius: 3 },
+      { label: 'Summer Short Term', data: [6,8,0,17,5,0,0,0,0], backgroundColor: '#5C4700', borderRadius: 3 },
+      { label: 'Spring Short Term', data: [0,5,0,0,0,0,0,0,0], backgroundColor: '#9B9B6B', borderRadius: 3 },
+      { label: 'Academic Year', data: [0,0,3,0,3,0,0,0,1], backgroundColor: NAVY, borderRadius: 3 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, grid: { color: '#F0EBE0' } }
+    }
+  }
+});
+
+const termDonutCtx = document.getElementById('termDonut').getContext('2d');
+new Chart(termDonutCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Summer Semester','Spring Break','Spring Semester','Winter','Fall Semester','Other'],
+    datasets: [{
+      data: [1875, 830, 391, 282, 170, 94],
+      backgroundColor: [GOLD, SAGE, TEAL, LILAC, ROSE, '#D3D3D3'],
+      borderWidth: 0, hoverOffset: 8
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '65%',
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
+  }
+});
+
+// ---- PANEL 6: MAJORS ----
+const majorCatCtx = document.getElementById('majorCatBar').getContext('2d');
+new Chart(majorCatCtx, {
+  type: 'bar',
+  data: {
+    labels: YEARS,
+    datasets: [
+      { label: 'Arts, Hum. & Social Sci.', data: [122,176,171,169,140,74,139,146,166], backgroundColor: NAVY, borderRadius: 3, stack: 's' },
+      { label: 'Health Sciences',           data: [94,76,115,79,56,25,29,55,51],    backgroundColor: ROSE, borderRadius: 3, stack: 's' },
+      { label: 'Education',                 data: [70,52,54,81,49,3,8,24,49],       backgroundColor: TEAL, borderRadius: 3, stack: 's' },
+      { label: 'Fine Arts / Languages',     data: [51,45,41,49,24,66,23,26,12],     backgroundColor: LILAC, borderRadius: 3, stack: 's' },
+      { label: 'Other / Undeclared',        data: [49,64,33,48,96,1,10,12,40],      backgroundColor: '#D3D3D3', borderRadius: 3, stack: 's' },
+      { label: 'Business & Management',     data: [29,39,41,49,49,19,32,18,36],     backgroundColor: GOLD, borderRadius: 3, stack: 's' },
+      { label: 'STEM',                      data: [46,49,33,44,45,8,25,19,34],      backgroundColor: SAGE, borderRadius: 3, stack: 's' },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, grid: { color: '#F0EBE0' } }
+    }
+  }
+});
+
+const majorDonutCtx = document.getElementById('majorDonut').getContext('2d');
+new Chart(majorDonutCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Arts, Hum. & Social Sci.','Health Sciences','Education','Fine Arts / Languages','Other / Undeclared','Business & Management','STEM'],
+    datasets: [{
+      data: [1303, 580, 390, 337, 353, 312, 303],
+      backgroundColor: [NAVY, ROSE, TEAL, LILAC, '#D3D3D3', GOLD, SAGE],
+      borderWidth: 0, hoverOffset: 8
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '65%',
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } }
+  }
+});
+
+const topMajors = [
+  ['Undeclared / Honors', 289], ['Psychology', 176], ['Nutrition', 181],
+  ['Education — Special Ed', 158], ['Communications', 154], ['Criminal Justice', 165],
+  ['Political Science', 159], ['History', 143], ['Social Work', 120],
+  ['English', 118], ['Nursing', 113], ['Spanish (FL)', 92], ['Biology', 91],
+  ['Communicative Disorders', 86], ['Music Education', 48]
+];
+const maxMaj = topMajors[0][1];
+const majTbl = document.getElementById('majorTable');
+majTbl.innerHTML = '<thead><tr><th>#</th><th>Major</th><th>Total Students</th><th style="width:180px">Visual</th></tr></thead>';
+const majTbody = document.createElement('tbody');
+topMajors.forEach(([name, total], i) => {
+  const rank = i < 3 ? 'rank-'+(i+1) : 'rank-other';
+  const barW = Math.round(total / maxMaj * 160);
+  const tr = document.createElement('tr');
+  tr.innerHTML = '<td><span class="rank-badge '+rank+'">'+(i+1)+'</span></td><td><strong>'+name+'</strong></td><td>'+total+'</td><td class="bar-cell"><span class="bar-fill" style="width:'+barW+'px"></span></td>';
+  majTbody.appendChild(tr);
+});
+majTbl.appendChild(majTbody);
+</script>
+</body>
+</html>
